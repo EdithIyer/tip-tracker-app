@@ -16,5 +16,7 @@ steps:
   - 'gcr.io/$PROJECT_ID/streamlit-app:$COMMIT_SHA'
   - '--platform'
   - 'managed'
+options:
+  logging: CLOUD_LOGGING_ONLY
 images:
 - 'gcr.io/$PROJECT_ID/streamlit-app:$COMMIT_SHA'
