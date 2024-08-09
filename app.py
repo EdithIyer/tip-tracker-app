@@ -17,14 +17,14 @@ def get_google_sheets_client():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
 
-    try:
-        creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
-    # Create credentials object
-    except:
-        creds = Credentials.from_service_account_file(
-        credentials_path,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-        )
+    # try:
+    #     creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
+    # # Create credentials object
+    # except:
+    creds = Credentials.from_service_account_file(
+    credentials_path,
+    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    )
     
     return gspread.authorize(creds)
 
