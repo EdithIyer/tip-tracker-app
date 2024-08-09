@@ -12,11 +12,7 @@ def get_google_sheets_client():
     creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
     return gspread.authorize(creds)
 
-client = get_google_sheets_client()
 SHEET_ID = '18UQTLSQ0o2feCWLVBn21Fr4nVr32qJ4gpvQnsDtoiis'
-
-# Open the Google Sheet (replace with your sheet ID)
-sheet = client.open_by_key(SHEET_ID).sheet1
 
 def create_time_input(label, key):
     col1, col2 = st.columns(2)
@@ -26,11 +22,11 @@ def create_time_input(label, key):
         minute = st.selectbox(f"{label} (Minute)", range(0, 60, 15), key=f"{key}_minute")
     return f"{hour:02d}:{minute:02d}"
 
-def load_data():
+def load_data(sheet):
     data = sheet.get_all_records()
     return pd.DataFrame(data) if data else pd.DataFrame(columns=["date", "name", "time_started", "time_ended", "check_total", "tip_total"])
 
-def append_row(row_data):
+def append_row(sheet, row_data):
     sheet.append_row(row_data)
 
 def calculate_hours(start_time, end_time):
@@ -49,60 +45,67 @@ def calculate_daily_report(df):
     df['tip_share'] = df.apply(lambda row: total_tips * (row['hours'] / total_hours), axis=1)
     return df[['name', 'hours', 'tip_share']]
 
-st.title("Tip Tracker App")
+def main():
+    st.title("Tip Tracker App")
 
-# Input form
-st.header("Add Employee Shift")
-with st.form("employee_form"):
-    col1, col2 = st.columns(2)
-    with col1:
-        name = st.text_input("Name")
-        date = st.date_input("Date")
-        time_started = create_time_input("Time Started", "start")
-        time_ended = create_time_input("Time Ended", "end")
-    with col2:
-        check_total = st.number_input("Check Total", min_value=0.0, format="%.2f")
-        tip_total = st.number_input("Tip Total", min_value=0.0, format="%.2f")
+    client = get_google_sheets_client()
+    sheet = client.open_by_key(SHEET_ID).sheet1
 
-    submitted = st.form_submit_button("Add Employee")
-    if submitted:
-        new_row = [
-            date.strftime("%Y-%m-%d"),
-            name,
-            time_started,
-            time_ended,
-            check_total,
-            tip_total
-        ]
-        append_row(new_row)
-        st.success("Employee shift added successfully!")
+    # Input form
+    st.header("Add Employee Shift")
+    with st.form("employee_form"):
+        col1, col2 = st.columns(2)
+        with col1:
+            name = st.text_input("Name")
+            date = st.date_input("Date")
+            time_started = create_time_input("Time Started", "start")
+            time_ended = create_time_input("Time Ended", "end")
+        with col2:
+            check_total = st.number_input("Check Total", min_value=0.0, format="%.2f")
+            tip_total = st.number_input("Tip Total", min_value=0.0, format="%.2f")
 
-# Display employee shifts
-if st.button("Load Data"):
-    df = load_data()
-    if not df.empty:
-        st.dataframe(df)
-    else:
-        st.info("No employee shifts added yet.")
+        submitted = st.form_submit_button("Add Employee")
+        if submitted:
+            new_row = [
+                date.strftime("%Y-%m-%d"),
+                name,
+                time_started,
+                time_ended,
+                check_total,
+                tip_total
+            ]
+            append_row(sheet, new_row)
+            st.success("Employee shift added successfully!")
 
-# Generate daily report
-report_date = st.date_input("Select date for report")
-if st.button("Generate Daily Report"):
-    df = load_data()
-    daily_data = df[df['date'] == report_date.strftime("%Y-%m-%d")]
-    if daily_data.empty:
-        st.warning("No data available for the selected date.")
-    else:
-        daily_report = calculate_daily_report(daily_data)
-        st.header(f"Daily Report for {report_date}")
-        st.dataframe(daily_report.style.format({
-            "hours": "{:.2f}",
-            "tip_share": "${:.2f}"
-        }))
+    # Display employee shifts
+    if st.button("Load Data"):
+        df = load_data(sheet)
+        if not df.empty:
+            st.dataframe(df)
+        else:
+            st.info("No employee shifts added yet.")
 
-# Clear data button
-if st.button("Clear All Data"):
-    sheet.clear()
-    sheet.update([["date", "name", "time_started", "time_ended", "check_total", "tip_total"]])
-    st.success("All data has been cleared.")
-    st.experimental_rerun()
+    # Generate daily report
+    report_date = st.date_input("Select date for report")
+    if st.button("Generate Daily Report"):
+        df = load_data(sheet)
+        daily_data = df[df['date'] == report_date.strftime("%Y-%m-%d")]
+        if daily_data.empty:
+            st.warning("No data available for the selected date.")
+        else:
+            daily_report = calculate_daily_report(daily_data)
+            st.header(f"Daily Report for {report_date}")
+            st.dataframe(daily_report.style.format({
+                "hours": "{:.2f}",
+                "tip_share": "${:.2f}"
+            }))
+
+    # Clear data button
+    if st.button("Clear All Data"):
+        sheet.clear()
+        sheet.update([["date", "name", "time_started", "time_ended", "check_total", "tip_total"]])
+        st.success("All data has been cleared.")
+        st.experimental_rerun()
+
+if __name__ == "__main__":
+    main()
