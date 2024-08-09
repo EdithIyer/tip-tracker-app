@@ -1,18 +1,32 @@
+import os
 import streamlit as st
 import pandas as pd
 from datetime import datetime, timedelta
 import gspread
 from google.oauth2.service_account import Credentials
 
+
+CREDS_ID = "GOOGLE_SHEETS_CREDS"
+credentials_path = os.environ.get(CREDS_ID)
+SHEET_ID = os.environ.get("SHEET_ID")
+
 # Set up Google Sheets authentication
 @st.cache_resource
 def get_google_sheets_client():
+
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
-    creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
-    return gspread.authorize(creds)
 
-SHEET_ID = '18UQTLSQ0o2feCWLVBn21Fr4nVr32qJ4gpvQnsDtoiis'
+    try:
+        creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
+    # Create credentials object
+    except:
+        creds = Credentials.from_service_account_file(
+        credentials_path,
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+    
+    return gspread.authorize(creds)
 
 def create_time_input(label, key):
     col1, col2 = st.columns(2)
