@@ -14,7 +14,7 @@ steps:
   - 'streamlit-app'
   - '--image'
   - 'gcr.io/$PROJECT_ID/streamlit-app:$COMMIT_SHA'
-    - '--region'
+  - '--region'
   - 'us-east1'
   - '--platform'
   - 'managed'
