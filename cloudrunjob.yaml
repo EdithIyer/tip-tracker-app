@@ -10,5 +10,5 @@ steps:
   - |
     gcloud run deploy deploy-streamlit-app \
       --image gcr.io/$PROJECT_ID/deploy-streamlit-app:latest \
-      --region us-eastl1 \
+      --region us-east1 \
       --platform managed
