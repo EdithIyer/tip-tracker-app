@@ -4,14 +4,17 @@ FROM python:3.9-slim
 # Set the working directory in the container
 WORKDIR /app
 
-# Copy the current directory contents into the container at /app
-COPY . /app
-
+# Copy the requirements file into the container
 COPY requirements.txt .
+
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Copy the current directory contents into the container at /app
 COPY . .
 
-# Run streamlit when the contain er launches
-CMD ["streamlit", "run", --server.port 8080, "your_app.py"]
+# Make port 8080 available to the world outside this container
+EXPOSE 8080
+
+# Run streamlit when the container launches
+CMD streamlit run --server.port $PORT app.py
