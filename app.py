@@ -106,6 +106,8 @@ def main():
             st.dataframe(df)
         else:
             st.info("No employee shifts added yet.")
+    
+    # Add data to full spreadsheet        
     if st.button("Submit Daily Data", help="Click if you've completed adding tips for the date"):
         #All data from daily tips
         values = sheet.get_all_values()[1:]
