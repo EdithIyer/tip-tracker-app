@@ -1,14 +1,14 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:$COMMIT_SHA', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:latest', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:$COMMIT_SHA']
+  args: ['push', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:latest']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
     gcloud run deploy deploy-streamlit-app \
-      --image gcr.io/$PROJECT_ID/deploy-streamlit-app:$COMMIT_SHA \
+      --image gcr.io/$PROJECT_ID/deploy-streamlit-app:latest \
       --region us-eastl1 \
       --platform managed
