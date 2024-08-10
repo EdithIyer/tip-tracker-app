@@ -13,27 +13,24 @@ CREDENTIALS_PATH = "/projects/556700592642/secrets/leisuretime-gcp-credentials/l
 # Set up Google Sheets authentication
 @st.cache_resource
 def get_google_sheets_client():
+    scopes = [
+        'https://www.googleapis.com/auth/spreadsheets',
+        'https://www.googleapis.com/auth/drive'
+    ]
 
-    scope = ['https://spreadsheets.google.com/feeds',
-             'https://www.googleapis.com/auth/drive']
-
-    if not os.path.exists(CREDENTIALS_PATH):
-        try:
-            creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
-        # # Create credentials object
+    try:
+        if os.path.exists(CREDENTIALS_PATH):
+            creds = Credentials.from_service_account_file(CREDENTIALS_PATH, scopes=scopes)
+            logging.info("Used remote path")
+        else:
+            creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scopes)
             logging.info("Used local path")
-            logging.info(creds)
-            return gspread.authorize(creds)
-        except:
-            logging.info("Credentials Not found locally either")
-    else:
-        creds = Credentials.from_service_account_file(
-        CREDENTIALS_PATH,
-        scopes=["https://www.googleapis.com/auth/cloud-platform"]
-        )
-        logging.info("used remote path")
-        logging.info(creds)
+        
+        logging.info(f"Credentials: {creds}")
         return gspread.authorize(creds)
+    except Exception as e:
+        logging.error(f"Error creating credentials: {str(e)}")
+        raise
 
 def create_time_input(label, key):
     col1, col2 = st.columns(2)
