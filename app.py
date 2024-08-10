@@ -9,7 +9,7 @@ import logging
 
 CREDS_ID = "GOOGLE_SHEETS_CREDS"
 SHEET_ID = os.environ.get("SHEET_ID")
-CREDENTIALS_PATH = "projects/556700592642/secrets/leisuretime-gcp-credentials"
+CREDENTIALS_PATH = "/projects/556700592642/secrets/leisuretime-gcp-credentials/leisuretime-gcp-credentials"
 # Set up Google Sheets authentication
 @st.cache_resource
 def get_google_sheets_client():
