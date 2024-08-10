@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 import gspread
 from google.oauth2.service_account import Credentials
 import logging
+from utils import utils
 
 
 CREDS_ID = "GOOGLE_SHEETS_CREDS"
@@ -67,7 +68,10 @@ def main():
     st.title("Shift Tip Tracker")
 
     client = get_google_sheets_client()
-    sheet = client.open_by_key(SHEET_ID).sheet1
+    full_spreaadsheet = client.open_by_key(SHEET_ID)
+
+    sheet = full_spreaadsheet.worksheet("Daily Tip Entry")
+    all_tip_data = full_spreaadsheet.worksheet("All Tips")
 
     # Input form
     st.header("Add Employee Shift")
@@ -102,11 +106,22 @@ def main():
             st.dataframe(df)
         else:
             st.info("No employee shifts added yet.")
+    if st.button("Submit Daily Data", help="Click if you've completed adding tips for the date"):
+        #All data from daily tips
+        values = sheet.get_all_values()[1:]
+        
+        for row in values:
+            new_id = utils.generate_uuid_from_columns(row[0], row[1], row[2], row[3], row[4], row[5])
+            new_final_row = [
+                new_id,
+                row[0], row[1], row[2], row[3], row[4], row[5]
+            ]
+            append_row(all_tip_data, new_final_row)
 
     # Generate daily report
     report_date = st.date_input("Select date for report")
     if st.button("Generate Daily Report"):
-        df = load_data(sheet)
+        df = load_data(all_tip_data)
         daily_data = df[df['date'] == report_date.strftime("%Y-%m-%d")]
         if daily_data.empty:
             st.warning("No data available for the selected date.")
@@ -118,12 +133,17 @@ def main():
                 "tip_share": "${:.2f}"
             }))
 
+
+
     # Clear data button
-    if st.button("Clear All Data", help="Click this button to delete all entered data in the linked spreadsheet"):
+    if st.button("Clear Daily Data", help="Click this button to delete all entered data in the linked spreadsheet"):
         sheet.clear()
         sheet.update([["date", "name", "time_started", "time_ended", "check_total", "tip_total"]])
         st.success("All data has been cleared.")
         st.experimental_rerun()
+    
+
+        
 
 if __name__ == "__main__":
     main()
