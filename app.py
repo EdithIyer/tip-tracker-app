@@ -21,15 +21,15 @@ def get_google_sheets_client():
         try:
             creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
         # # Create credentials object
+            return gspread.authorize(creds)
         except:
             logging.info("Credentials Not found locally either")
     else:
         creds = Credentials.from_service_account_file(
         CREDENTIALS_PATH,
-     scopes=["https://www.googleapis.com/auth/cloud-platform"]
-    )
-
-    return gspread.authorize(creds)
+        scopes=["https://www.googleapis.com/auth/cloud-platform"]
+        )
+        return gspread.authorize(creds)
 
 def create_time_input(label, key):
     col1, col2 = st.columns(2)
