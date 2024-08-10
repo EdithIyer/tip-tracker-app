@@ -4,12 +4,12 @@ import pandas as pd
 from datetime import datetime, timedelta
 import gspread
 from google.oauth2.service_account import Credentials
+import logging
 
 
 CREDS_ID = "GOOGLE_SHEETS_CREDS"
-credentials_path = os.environ.get(CREDS_ID)
 SHEET_ID = os.environ.get("SHEET_ID")
-
+CREDENTIALS_PATH = "projects/556700592642/secrets/leisuretime-gcp-credentials"
 # Set up Google Sheets authentication
 @st.cache_resource
 def get_google_sheets_client():
@@ -17,15 +17,19 @@ def get_google_sheets_client():
     scope = ['https://spreadsheets.google.com/feeds',
              'https://www.googleapis.com/auth/drive']
 
-    # try:
-    #     creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
+    if not os.path.exists(CREDENTIALS_PATH):
+        logging.Info(f"Unable to find path {CREDENTIALS_PATH}. Checking locally")
+    try:
+        creds = Credentials.from_service_account_file('/Users/edithiyer-hernandez/Desktop/leisure_apps/tip-calculation-project-7ba01a5e9f72.json', scopes=scope)
     # # Create credentials object
-    # except:
-    creds = Credentials.from_service_account_file(
-    credentials_path,
-    scopes=["https://www.googleapis.com/auth/cloud-platform"]
+    except:
+        logging.Info("Credentials Not found locally either")
+    else:
+        creds = Credentials.from_service_account_file(
+        CREDENTIALS_PATH,
+     scopes=["https://www.googleapis.com/auth/cloud-platform"]
     )
-    
+
     return gspread.authorize(creds)
 
 def create_time_input(label, key):
