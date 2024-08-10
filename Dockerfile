@@ -7,11 +7,11 @@ WORKDIR /app
 # Copy the current directory contents into the container at /app
 COPY . /app
 
+COPY requirements.txt .
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Make port 8501 available to the world outside this container
-EXPOSE 8501
+COPY . .
 
-# Run streamlit when the container launches
-CMD ["streamlit", "run", "your_app.py"]
+# Run streamlit when the contain er launches
+CMD ["streamlit", "run", --server.port 8080, "your_app.py"]
