@@ -1,14 +1,14 @@
 steps:
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['build', '-t', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:latest', '.']
+  args: ['build', '-t', 'gcr.io/$PROJECT_ID/tip-tracker-app:latest', '.']
 - name: 'gcr.io/cloud-builders/docker'
-  args: ['push', 'gcr.io/$PROJECT_ID/deploy-streamlit-app:latest']
+  args: ['push', 'gcr.io/$PROJECT_ID/tip-tracker-app:latest']
 - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
   entrypoint: 'bash'
   args:
   - '-c'
   - |
-    gcloud run deploy deploy-streamlit-app \
-      --image gcr.io/$PROJECT_ID/deploy-streamlit-app:latest \
+    gcloud run deploy tip-tracker-app \
+      --image gcr.io/$PROJECT_ID/tip-tracker-app:latest \
       --region us-east1 \
       --platform managed
