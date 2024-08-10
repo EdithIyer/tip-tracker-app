@@ -64,7 +64,7 @@ def calculate_daily_report(df):
     return df[['name', 'hours', 'tip_share']]
 
 def main():
-    st.title("Tip Tracker App")
+    st.title("Shift Tip Tracker")
 
     client = get_google_sheets_client()
     sheet = client.open_by_key(SHEET_ID).sheet1
@@ -119,7 +119,7 @@ def main():
             }))
 
     # Clear data button
-    if st.button("Clear All Data"):
+    if st.button("Clear All Data", help="Click this button to delete all entered data in the linked spreadsheet"):
         sheet.clear()
         sheet.update([["date", "name", "time_started", "time_ended", "check_total", "tip_total"]])
         st.success("All data has been cleared.")
